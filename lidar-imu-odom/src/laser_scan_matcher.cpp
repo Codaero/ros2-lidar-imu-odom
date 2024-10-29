@@ -35,7 +35,7 @@
  *  on Robotics and Automation (ICRA), 2008
  */
 
-#include "ros2_laser_scan_matcher/laser_scan_matcher.h"
+#include "laser_scan_matcher.h"
 
 #undef min
 #undef max

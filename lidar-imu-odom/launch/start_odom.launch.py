@@ -11,14 +11,14 @@ def generate_launch_description():
     use_sim_time=LaunchConfiguration('use_sim_time')
 
     odometry_node = Node(
-        package='ros2_laser_scan_matcher',
+        package='lidar-imu-odom',
         parameters=[{
-                'base_frame': 'base_link',
+                'base_frame': 'os_sensor',
                 'odom_frame': 'odom_matcher',
-                'laser_frame': 'lidar',
+                'laser_frame': 'os_lidar',
                 'publish_odom': '/odom_matcher',
                 'publish_tf': True,
-                'scan_sub_topic' : '/scan'
+                'scan_sub_topic' : '/scanner/scan'
             }],
         executable='laser_scan_matcher',
         name='laser_scan_odom_publisher',
@@ -26,10 +26,10 @@ def generate_launch_description():
     
     pointcloud_to_laserscan_node = Node(
         package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
-        remappings=[('cloud_in', [LaunchConfiguration(variable_name='scanner'), '/cloud']),
+        remappings=[('cloud_in', '/ouster/points'),
                         ('scan', [LaunchConfiguration(variable_name='scanner'), '/scan'])],
             parameters=[{
-                'target_frame': 'cloud',
+                'target_frame': 'os_lidar',
                 'transform_tolerance': 0.01,
                 'min_height': 0.0,
                 'max_height': 1.0,
@@ -47,14 +47,10 @@ def generate_launch_description():
     
     imu_compfilter_node = Node(
         package='imu_complementary_filter', executable='complementary_filter_node',
-        remappings=[('imu/data_raw', '/os1_cloud_node/imu')],
-        parameters=[{
-                'publish_debug_topics': False,
-                'fixed_frame': "odom",
-                'publish_tf': False,
-            }],
+        remappings=[('imu/data_raw', '/ouster/imu')],
+        parameters=[os.path.join(get_package_share_directory("lidar-imu-odom"), 'config', 'imu_comp_filter.yaml')],
         name='imu_complementary_filter'
-    ),
+    )
     
     ekf_node = Node(
         package="robot_localization", executable="ekf_node",
@@ -65,10 +61,13 @@ def generate_launch_description():
 
     # Create and return the launch description
     return LaunchDescription([
-        launch.actions.DeclareLaunchArgument(name='use_sim_time', default_value='True',
+        launch.actions.DeclareLaunchArgument(name='use_sim_time', default_value='False',
                                         description='Flag to enable use_sim_time'),
-        odometry_node,
+        launch.actions.DeclareLaunchArgument(name='scanner', default_value='scanner',
+                                        description='Namespace for sample topics'),
         pointcloud_to_laserscan_node,
-        imu_compfilter_node
+        odometry_node,
+        imu_compfilter_node,
+        ekf_node
     ])
 

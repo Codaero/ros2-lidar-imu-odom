@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(ros2_laser_scan_matcher)
+project(lidar-imu-odom)
 
 find_package(ament_cmake REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -45,7 +45,7 @@ ament_target_dependencies(laser_scan_matcher
 # Install configuration files
 install(
   DIRECTORY config
-  DESTINATION share/${PROJECT_NAME}/config
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(TARGETS laser_scan_matcher DESTINATION lib/${PROJECT_NAME})
