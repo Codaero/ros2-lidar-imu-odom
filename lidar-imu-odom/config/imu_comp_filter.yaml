@@ -1,4 +1,4 @@
-complementary_filter_gain_node:
+imu_complementary_filter:
   ros__parameters:
     gain_acc: 0.01
     gain_mag: 0.01
@@ -13,7 +13,7 @@ complementary_filter_gain_node:
     publish_debug_topics: false
 
     qos_overrides:
-      /imu/data_raw:
+      /ouster/imu:
         subscription:
           depth: 10
           durability: volatile
